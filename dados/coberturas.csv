@@ -1,0 +1,172 @@
+grupo_idade,vacina,ano,cobertura,sistema,numerador,denominador
+Menores de 1 ano,BCG,2015,105.082043982,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,BCG,2016,95.5505070002,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,BCG,2017,97.9789221523,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,BCG,2018,99.7161640061,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,BCG,2019,86.6714208282,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,BCG,2020,77.1408618126,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,BCG,2021,74.9650458179,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,BCG,2022,90.0905779049,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,BCG,2023,86.32490657183358,RNDS (LocalizaSUS),2190504,2537511
+Menores de 1 ano,BCG,2024,98.2582553423199,RNDS (LocalizaSUS),2347656,2389271
+Menores de 1 ano,BCG,2025,99.97907311477016,RNDS (LocalizaSUS),2388771,2389271
+Menores de 1 ano,Hepatite B ao nascer,2015,90.931554723,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Hepatite B ao nascer,2016,81.7456085799,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Hepatite B ao nascer,2017,85.8791492555,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Hepatite B ao nascer,2018,88.3999770122,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Hepatite B ao nascer,2019,78.5712306048,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Hepatite B ao nascer,2020,65.7731029775,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Hepatite B ao nascer,2021,67.0296772,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Hepatite B ao nascer,2022,82.7603076463,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Hepatite B ao nascer,2023,82.08484613465716,RNDS (LocalizaSUS),2082912,2537511
+Menores de 1 ano,Hepatite B ao nascer,2024,96.87582530403628,RNDS (LocalizaSUS),2314626,2389271
+Menores de 1 ano,Hepatite B ao nascer,2025,100.200395852961,RNDS (LocalizaSUS),2394059,2389271
+Menores de 1 ano,Rotavírus,2015,95.3499623196,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Rotavírus,2016,88.9781681337,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Rotavírus,2017,85.1172614326,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Rotavírus,2018,91.3284716541,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Rotavírus,2019,85.3975503525,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Rotavírus,2020,77.9385083335,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Rotavírus,2021,71.7984862036,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Rotavírus,2022,76.6053426072,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Rotavírus,2023,85.95812983667854,RNDS (LocalizaSUS),2181197,2537511
+Menores de 1 ano,Rotavírus,2024,89.72196958821331,RNDS (LocalizaSUS),2143701,2389271
+Menores de 1 ano,Rotavírus,2025,91.14851350056148,RNDS (LocalizaSUS),2177785,2389271
+Menores de 1 ano,Meningocócica C,2015,98.1877926604,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Meningocócica C,2016,91.6769390434,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Meningocócica C,2017,87.4438086253,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Meningocócica C,2018,88.4879566763,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Meningocócica C,2019,87.4121283789,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Meningocócica C,2020,79.2268426146,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Meningocócica C,2021,72.167391721,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Meningocócica C,2022,78.6327059286,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Meningocócica C,2023,85.40494996868979,RNDS (LocalizaSUS),2167160,2537511
+Menores de 1 ano,Meningocócica C,2024,89.44272123170623,RNDS (LocalizaSUS),2137029,2389271
+Menores de 1 ano,Meningocócica C,2025,91.4066257029864,RNDS (LocalizaSUS),2183952,2389271
+Menores de 1 ano,Penta (DTP/HepB/Hib),2015,96.2959517112,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Penta (DTP/HepB/Hib),2016,89.2681464937,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Penta (DTP/HepB/Hib),2017,84.2392328775,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Penta (DTP/HepB/Hib),2018,88.4850374611,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Penta (DTP/HepB/Hib),2019,70.7572001624,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Penta (DTP/HepB/Hib),2020,77.8619825492,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Penta (DTP/HepB/Hib),2021,71.5250007459,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Penta (DTP/HepB/Hib),2022,77.2408056036,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Penta (DTP/HepB/Hib),2023,85.28219188015342,RNDS (LocalizaSUS),2164045,2537511
+Menores de 1 ano,Penta (DTP/HepB/Hib),2024,90.54012709315936,RNDS (LocalizaSUS),2163249,2389271
+Menores de 1 ano,Penta (DTP/HepB/Hib),2025,88.86857120854017,RNDS (LocalizaSUS),2123311,2389271
+Menores de 1 ano,Pneumocócica 10-valente,2015,94.225546779,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Pneumocócica 10-valente,2016,94.9970585557,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Pneumocócica 10-valente,2017,92.149318614,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Pneumocócica 10-valente,2018,95.252207638,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Pneumocócica 10-valente,2019,89.0735609167,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Pneumocócica 10-valente,2020,82.037177412,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Pneumocócica 10-valente,2021,74.8417337195,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Pneumocócica 10-valente,2022,81.5130012037,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Pneumocócica 10-valente,2023,89.35811509782617,RNDS (LocalizaSUS),2267472,2537511
+Menores de 1 ano,Pneumocócica 10-valente,2024,93.31737588578272,RNDS (LocalizaSUS),2229605,2389271
+Menores de 1 ano,Pneumocócica 10-valente,2025,93.93384007088356,RNDS (LocalizaSUS),2244334,2389271
+Menores de 1 ano,Poliomielite,2015,98.294820783,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Poliomielite,2016,84.4326204321,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Poliomielite,2017,84.7433298625,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Poliomielite,2018,89.5435124961,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Poliomielite,2019,84.1871616359,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Poliomielite,2020,76.7910151132,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Poliomielite,2021,71.0362353305,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Poliomielite,2022,77.2047979874,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Poliomielite,2023,86.10461196030283,RNDS (LocalizaSUS),2184914,2537511
+Menores de 1 ano,Poliomielite,2024,90.74035553103856,RNDS (LocalizaSUS),2168033,2389271
+Menores de 1 ano,Poliomielite,2025,88.40114830004633,RNDS (LocalizaSUS),2112143,2389271
+Menores de 1 ano,Febre Amarela,2015,46.3097559534,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Febre Amarela,2016,44.5912256991,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Febre Amarela,2017,47.3724193186,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Febre Amarela,2018,59.5035894221,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Febre Amarela,2019,62.4071735163,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Febre Amarela,2020,57.6352466142,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Febre Amarela,2021,58.1859861368,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Febre Amarela,2022,60.6724515824,SI-PNI (Tabnet),NA,NA
+Menores de 1 ano,Febre Amarela,2023,72.24323362539118,RNDS (LocalizaSUS),1833180,2537511
+Menores de 1 ano,Febre Amarela,2024,73.61253704581858,RNDS (LocalizaSUS),1758803,2389271
+Menores de 1 ano,Febre Amarela,2025,74.19099800734199,RNDS (LocalizaSUS),1772624,2389271
+1 ano,Tríplice Viral 1ª dose,2015,96.0669749325,SI-PNI (Tabnet),NA,NA
+1 ano,Tríplice Viral 1ª dose,2016,95.4051314511,SI-PNI (Tabnet),NA,NA
+1 ano,Tríplice Viral 1ª dose,2017,86.2448016993,SI-PNI (Tabnet),NA,NA
+1 ano,Tríplice Viral 1ª dose,2018,92.6085775997,SI-PNI (Tabnet),NA,NA
+1 ano,Tríplice Viral 1ª dose,2019,93.1182808204,SI-PNI (Tabnet),NA,NA
+1 ano,Tríplice Viral 1ª dose,2020,80.8803613669,SI-PNI (Tabnet),NA,NA
+1 ano,Tríplice Viral 1ª dose,2021,74.9433986107,SI-PNI (Tabnet),NA,NA
+1 ano,Tríplice Viral 1ª dose,2022,80.7043866288,SI-PNI (Tabnet),NA,NA
+1 ano,Tríplice Viral 1ª dose,2023,89.81222150367033,RNDS (LocalizaSUS),2278995,2537511
+1 ano,Tríplice Viral 1ª dose,2024,95.87326008644476,RNDS (LocalizaSUS),2290672,2389271
+1 ano,Tríplice Viral 1ª dose,2025,92.95944244081144,RNDS (LocalizaSUS),2221053,2389271
+1 ano,Tríplice Viral 2ª dose,2015,79.9357762347,SI-PNI (Tabnet),NA,NA
+1 ano,Tríplice Viral 2ª dose,2016,76.7083306875,SI-PNI (Tabnet),NA,NA
+1 ano,Tríplice Viral 2ª dose,2017,72.9396253321,SI-PNI (Tabnet),NA,NA
+1 ano,Tríplice Viral 2ª dose,2018,76.8878199008,SI-PNI (Tabnet),NA,NA
+1 ano,Tríplice Viral 2ª dose,2019,81.5481482267,SI-PNI (Tabnet),NA,NA
+1 ano,Tríplice Viral 2ª dose,2020,64.2657233554,SI-PNI (Tabnet),NA,NA
+1 ano,Tríplice Viral 2ª dose,2021,53.1991746969,SI-PNI (Tabnet),NA,NA
+1 ano,Tríplice Viral 2ª dose,2022,57.6413514154,SI-PNI (Tabnet),NA,NA
+1 ano,Tríplice Viral 2ª dose,2023,69.61542235678978,RNDS (LocalizaSUS),1766499,2537511
+1 ano,Tríplice Viral 2ª dose,2024,80.75479926722419,RNDS (LocalizaSUS),1929451,2389271
+1 ano,Tríplice Viral 2ª dose,2025,78.35256025791968,RNDS (LocalizaSUS),1872055,2389271
+1 ano,Hepatite A,2015,97.0684769788,SI-PNI (Tabnet),NA,NA
+1 ano,Hepatite A,2016,71.5794665352,SI-PNI (Tabnet),NA,NA
+1 ano,Hepatite A,2017,78.9353786171,SI-PNI (Tabnet),NA,NA
+1 ano,Hepatite A,2018,82.6875638292,SI-PNI (Tabnet),NA,NA
+1 ano,Hepatite A,2019,85.0205630967,SI-PNI (Tabnet),NA,NA
+1 ano,Hepatite A,2020,75.8960085144,SI-PNI (Tabnet),NA,NA
+1 ano,Hepatite A,2021,67.5361238973,SI-PNI (Tabnet),NA,NA
+1 ano,Hepatite A,2022,72.9886384122,SI-PNI (Tabnet),NA,NA
+1 ano,Hepatite A,2023,83.23073279288248,RNDS (LocalizaSUS),2111989,2537511
+1 ano,Hepatite A,2024,86.23864768793493,RNDS (LocalizaSUS),2060475,2389271
+1 ano,Hepatite A,2025,84.99153088954749,RNDS (LocalizaSUS),2030678,2389271
+1 ano,Meningocócica C 1º reforço,2015,87.853708803,SI-PNI (Tabnet),NA,NA
+1 ano,Meningocócica C 1º reforço,2016,93.8585741144,SI-PNI (Tabnet),NA,NA
+1 ano,Meningocócica C 1º reforço,2017,78.5590229069,SI-PNI (Tabnet),NA,NA
+1 ano,Meningocócica C 1º reforço,2018,80.2153246248,SI-PNI (Tabnet),NA,NA
+1 ano,Meningocócica C 1º reforço,2019,85.7792922792,SI-PNI (Tabnet),NA,NA
+1 ano,Meningocócica C 1º reforço,2020,76.5536739591,SI-PNI (Tabnet),NA,NA
+1 ano,Meningocócica C 1º reforço,2021,68.6960045282,SI-PNI (Tabnet),NA,NA
+1 ano,Meningocócica C 1º reforço,2022,75.3454423442,SI-PNI (Tabnet),NA,NA
+1 ano,Meningocócica C 1º reforço,2023,85.40857556873645,RNDS (LocalizaSUS),2167252,2537511
+1 ano,Meningocócica C 1º reforço,2024,92.24738424398068,RNDS (LocalizaSUS),2204040,2389271
+1 ano,Meningocócica C 1º reforço,2025,90.53363975873812,RNDS (LocalizaSUS),2163094,2389271
+1 ano,Pneumocócica 1º reforço,2015,88.352567719,SI-PNI (Tabnet),NA,NA
+1 ano,Pneumocócica 1º reforço,2016,84.0954752678,SI-PNI (Tabnet),NA,NA
+1 ano,Pneumocócica 1º reforço,2017,76.3115158696,SI-PNI (Tabnet),NA,NA
+1 ano,Pneumocócica 1º reforço,2018,81.9867733432,SI-PNI (Tabnet),NA,NA
+1 ano,Pneumocócica 1º reforço,2019,83.4684780679,SI-PNI (Tabnet),NA,NA
+1 ano,Pneumocócica 1º reforço,2020,72.1448287871,SI-PNI (Tabnet),NA,NA
+1 ano,Pneumocócica 1º reforço,2021,66.1411680653,SI-PNI (Tabnet),NA,NA
+1 ano,Pneumocócica 1º reforço,2022,71.5408801574,SI-PNI (Tabnet),NA,NA
+1 ano,Pneumocócica 1º reforço,2023,86.18118305694044,RNDS (LocalizaSUS),2186857,2537511
+1 ano,Pneumocócica 1º reforço,2024,93.25693904123894,RNDS (LocalizaSUS),2228161,2389271
+1 ano,Pneumocócica 1º reforço,2025,89.59942174830732,RNDS (LocalizaSUS),2140773,2389271
+1 ano,DTP 1º reforço,2015,85.7788018846,SI-PNI (Tabnet),NA,NA
+1 ano,DTP 1º reforço,2016,64.2760502602,SI-PNI (Tabnet),NA,NA
+1 ano,DTP 1º reforço,2017,72.3984980722,SI-PNI (Tabnet),NA,NA
+1 ano,DTP 1º reforço,2018,73.2663405316,SI-PNI (Tabnet),NA,NA
+1 ano,DTP 1º reforço,2019,57.0835532511,SI-PNI (Tabnet),NA,NA
+1 ano,DTP 1º reforço,2020,77.2122917526,SI-PNI (Tabnet),NA,NA
+1 ano,DTP 1º reforço,2021,63.6505752679,SI-PNI (Tabnet),NA,NA
+1 ano,DTP 1º reforço,2022,67.4492111232,SI-PNI (Tabnet),NA,NA
+1 ano,DTP 1º reforço,2023,83.82580410488862,RNDS (LocalizaSUS),2127089,2537511
+1 ano,DTP 1º reforço,2024,86.7782264967013,RNDS (LocalizaSUS),2073367,2389271
+1 ano,DTP 1º reforço,2025,84.62648230359804,RNDS (LocalizaSUS),2021956,2389271
+1 ano,Poliomielite 1º reforço,2015,84.5222885813,SI-PNI (Tabnet),NA,NA
+1 ano,Poliomielite 1º reforço,2016,74.360859143,SI-PNI (Tabnet),NA,NA
+1 ano,Poliomielite 1º reforço,2017,73.5659712527,SI-PNI (Tabnet),NA,NA
+1 ano,Poliomielite 1º reforço,2018,72.8283600836,SI-PNI (Tabnet),NA,NA
+1 ano,Poliomielite 1º reforço,2019,74.6165547376,SI-PNI (Tabnet),NA,NA
+1 ano,Poliomielite 1º reforço,2020,69.3009443979,SI-PNI (Tabnet),NA,NA
+1 ano,Poliomielite 1º reforço,2021,60.501821736,SI-PNI (Tabnet),NA,NA
+1 ano,Poliomielite 1º reforço,2022,67.7162385986,SI-PNI (Tabnet),NA,NA
+1 ano,Poliomielite 1º reforço,2023,82.52917918385378,RNDS (LocalizaSUS),2094187,2537511
+1 ano,Poliomielite 1º reforço,2024,88.16676718547205,RNDS (LocalizaSUS),2106543,2389271
+1 ano,Poliomielite 1º reforço,2025,85.90657987310773,RNDS (LocalizaSUS),2052541,2389271
+1 ano,Varicela,2020,74.4324162166,SI-PNI (Tabnet),NA,NA
+1 ano,Varicela,2021,67.0494752371,SI-PNI (Tabnet),NA,NA
+1 ano,Varicela,2022,73.324656638,SI-PNI (Tabnet),NA,NA
+1 ano,Varicela,2023,67.25976754386484,RNDS (LocalizaSUS),1706724,2537511
+1 ano,Varicela,2024,73.48032098493641,RNDS (LocalizaSUS),1755644,2389271
+1 ano,Varicela,2025,77.98512600705403,RNDS (LocalizaSUS),1863276,2389271

@@ -1,0 +1,823 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Saúde pública no Brasil</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<style>
+:root {
+  color-scheme: dark;
+  --surface: #121211;
+  --surface-2: #1c1c1a;
+  --text-primary: #f3f2ee;
+  --text-secondary: #c3c2b7;
+  --text-muted: #8f8e86;
+  --grid: #2b2b28;
+  --line-faint: #3d3d39;
+  --series: #4b97ee;
+  --median: #ffffff;
+  --meta: #f07a45;
+  --brasil: #4b97ee;
+  --eua: #f07a45;
+  --card: rgba(28, 28, 26, 0.92);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--text-primary);
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 20px;
+  line-height: 1.6;
+}
+
+/* capa em tela cheia com as séries se desenhando ao fundo */
+.capa { position: relative; height: 100vh; min-height: 560px; overflow: hidden; display: flex; align-items: flex-end; }
+.capa canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.capa::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(18,18,17,0.15) 0%, rgba(18,18,17,0.55) 55%, var(--surface) 100%); pointer-events: none; }
+.capa .conteudo { position: relative; z-index: 2; max-width: 1100px; width: 100%; margin: 0 auto; padding: 0 16px 12vh; }
+.capa h1 { font-size: clamp(44px, 8vw, 96px); line-height: 1.02; margin: 0 0 24px; font-weight: 700; letter-spacing: -0.01em; }
+.capa p { color: var(--text-secondary); margin: 0; max-width: 560px; font-size: clamp(18px, 2.2vw, 22px); }
+.rotulo { font-family: Inter, system-ui, sans-serif; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 16px; }
+.seta { margin-top: 40px; font-family: Inter, system-ui, sans-serif; font-size: 13px; color: var(--text-muted); }
+.seta span { display: inline-block; animation: desce 1.8s ease-in-out infinite; }
+@keyframes desce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
+
+/* capítulo com gráfico fixo e texto rolando */
+.capitulo { padding-top: 120px; }
+.capitulo > header { max-width: 1200px; margin: 0 auto 24px; padding: 0 16px; }
+.capitulo > header .numero { font-family: Inter, system-ui, sans-serif; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--series); margin-bottom: 8px; }
+.capitulo > header h2 { font-size: clamp(34px, 5vw, 60px); line-height: 1.05; margin: 0; font-weight: 700; }
+.rolagem { position: relative; display: grid; grid-template-columns: minmax(280px, 380px) 1fr; gap: 56px; max-width: 1200px; margin: 0 auto; padding: 0 16px; }
+.passos { position: relative; z-index: 2; }
+.passo { min-height: 90vh; display: flex; align-items: center; }
+.passo:first-child { min-height: 70vh; }
+.passo:last-child { min-height: 100vh; }
+.passo .cartao {
+  background: var(--card);
+  border: 1px solid var(--grid);
+  border-left: 3px solid var(--grid);
+  border-radius: 6px;
+  padding: 22px 24px;
+  color: var(--text-muted);
+  transition: color 0.4s, border-color 0.4s;
+}
+.passo.ativo .cartao { color: var(--text-primary); border-left-color: var(--series); }
+.grafico-fixo { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; justify-content: center; }
+.grafico-fixo h3 { font-family: Inter, system-ui, sans-serif; font-size: 18px; font-weight: 600; margin: 0 0 2px; }
+.grafico-fixo .sub { font-family: Inter, system-ui, sans-serif; font-size: 13px; color: var(--text-secondary); margin: 0 0 8px; }
+.grafico-fixo svg { width: 100%; height: auto; display: block; overflow: visible; }
+.fonte { font-family: Inter, system-ui, sans-serif; font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+
+svg text { font-family: Inter, system-ui, sans-serif; fill: var(--text-secondary); font-size: 12px; }
+.eixo .tick line { stroke: var(--grid); }
+.linha-fraca { fill: none; stroke: var(--line-faint); stroke-width: 1.2; }
+.linha-destaque { fill: none; stroke: var(--series); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.linha-mediana { fill: none; stroke: var(--median); stroke-width: 4; stroke-linejoin: round; stroke-linecap: round; }
+.meta-linha { stroke: var(--meta); stroke-width: 2; stroke-dasharray: 6 5; }
+.meta-texto { fill: var(--meta); font-weight: 600; }
+.troca-sistema { stroke: var(--text-muted); stroke-width: 1; stroke-dasharray: 2 4; }
+.anotacao { fill: var(--text-primary); font-weight: 600; font-size: 15px; }
+.ponto-mediana { fill: var(--median); stroke: var(--surface); stroke-width: 2.5; }
+.rotulo-vacina { fill: var(--text-primary); font-size: 11.5px; }
+.linha-hover { stroke-width: 3.5 !important; opacity: 1 !important; }
+.linha-pais { fill: none; stroke-width: 2.2; stroke-linejoin: round; stroke-linecap: round; }
+.linha-pais.BRA { stroke: var(--brasil); }
+.linha-pais.USA { stroke: var(--eua); }
+.rotulo-pais { font-weight: 600; font-size: 14px; }
+.rotulo-pais.BRA { fill: var(--brasil); }
+.rotulo-pais.USA { fill: var(--eua); }
+.mira { stroke: var(--text-muted); stroke-width: 1; }
+.linha-principal { fill: none; stroke: var(--series); stroke-width: 3.5; stroke-linejoin: round; stroke-linecap: round; }
+.ponto-principal { fill: var(--series); stroke: var(--surface); stroke-width: 2.5; }
+.quadro-pontos { position: relative; width: 100%; aspect-ratio: 720 / 460; }
+.quadro-pontos canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+.dica {
+  position: fixed; pointer-events: none; z-index: 10;
+  background: var(--surface-2); border: 1px solid var(--grid); border-radius: 6px;
+  padding: 8px 10px; font-family: Inter, system-ui, sans-serif; font-size: 13px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.4); opacity: 0; transition: opacity 0.15s;
+}
+.dica b { display: block; color: var(--text-primary); font-weight: 600; }
+.dica span { color: var(--text-secondary); }
+
+details.tabela { max-width: 1200px; margin: 0 auto; padding: 24px 16px 64px; font-family: Inter, system-ui, sans-serif; font-size: 14px; }
+details.tabela summary { cursor: pointer; color: var(--text-secondary); }
+.tabela-rolagem { overflow-x: auto; margin-top: 12px; }
+details.tabela table { border-collapse: collapse; font-variant-numeric: tabular-nums; }
+details.tabela th, details.tabela td { padding: 4px 8px; border-bottom: 1px solid var(--grid); text-align: right; white-space: nowrap; }
+details.tabela th:first-child, details.tabela td:first-child { text-align: left; }
+
+footer a { color: var(--text-secondary); }
+footer { max-width: 1200px; margin: 0 auto; padding: 32px 16px 64px; font-family: Inter, system-ui, sans-serif; font-size: 13px; color: var(--text-muted); border-top: 1px solid var(--grid); }
+
+@media (max-width: 820px) {
+  body { font-size: 17px; }
+  .rolagem { display: flex; flex-direction: column; gap: 0; }
+  .grafico-fixo { order: -1; height: 62vh; padding-top: 8px; z-index: 1; background: var(--surface); }
+  .passos { margin-top: -30vh; }
+  .passo { min-height: 75vh; align-items: flex-end; }
+  .passo:first-child { min-height: 50vh; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .seta span { animation: none; }
+}
+</style>
+</head>
+<body>
+
+<section class="capa">
+  <canvas id="capa-canvas" aria-hidden="true"></canvas>
+  <div class="conteudo">
+    <div class="rotulo">Dados até setembro de 2026</div>
+    <h1>Saúde pública no Brasil, 2015 a 2025</h1>
+    <p>Dados do Ministério da Saúde, da Organização Mundial da Saúde e do CDC dos EUA.</p>
+    <div class="seta">role para baixo <span>↓</span></div>
+  </div>
+</section>
+
+<section class="capitulo" id="coberturas">
+  <header>
+    <div class="numero">Capítulo 1</div>
+    <h2>Cobertura vacinal</h2>
+  </header>
+  <div class="rolagem">
+    <div class="passos">
+      <div class="passo" data-passo="0"><div class="cartao">
+        O gráfico mostra a cobertura das 16 vacinas do calendário de menores de 1 ano e de 1 ano, de 2015 a 2025. Cada linha fina é uma vacina e a linha grossa é a mediana entre elas.
+      </div></div>
+      <div class="passo" data-passo="1"><div class="cartao">
+        Em 2015, a mediana das vacinas era de 94%. Em 2021, a mediana chegou a 68%, o ponto mais baixo da série, e nenhuma vacina passou de 75%.
+      </div></div>
+      <div class="passo" data-passo="2"><div class="cartao">
+        De 2021 a 2024, as 16 vacinas tiveram aumento de cobertura. A mediana passou de 68% para 90% em três anos.
+      </div></div>
+      <div class="passo" data-passo="3"><div class="cartao">
+        Em 2024, três das 16 vacinas atingiram a meta de 95% e oito passaram de 90%. A distância da mediana até a meta, que era de 27 pontos percentuais em 2021, ficou em 5 pontos.
+      </div></div>
+      <div class="passo" data-passo="4"><div class="cartao">
+        Em 2025, a mediana ficou em 89%, com nove vacinas entre 1 e 4 pontos percentuais abaixo de 2024. Os dados vêm do SI-PNI (Tabnet) até 2022 e da RNDS (LocalizaSUS) a partir de 2023, com a troca de sistema marcada pela linha pontilhada.
+      </div></div>
+    </div>
+    <div class="grafico-fixo">
+      <h3 id="cob-titulo">A cobertura das 16 vacinas</h3>
+      <p class="sub">Cobertura vacinal (%), menores de 1 ano e 1 ano, Brasil</p>
+      <svg id="cob-svg" viewBox="0 0 720 460" role="img" aria-labelledby="cob-titulo"></svg>
+      <div class="fonte">Fonte: SI-PNI (Tabnet), 2015 a 2022; RNDS (LocalizaSUS), 2023 a 2025. BCG e hepatite B ao nascer passam de 100% em alguns anos.</div>
+    </div>
+  </div>
+  <details class="tabela">
+    <summary>Ver os dados em tabela</summary>
+    <div class="tabela-rolagem"><table id="cob-tabela"></table></div>
+  </details>
+</section>
+
+<section class="capitulo" id="covid">
+  <header>
+    <div class="numero">Capítulo 2</div>
+    <h2>Óbitos por covid-19, Brasil e EUA</h2>
+  </header>
+  <div class="rolagem">
+    <div class="passos">
+      <div class="passo" data-passo="0"><div class="cartao">
+        O gráfico mostra os óbitos por covid-19 em cada semana, por milhão de habitantes, no Brasil e nos EUA. Nos dois países a contagem vem da declaração de óbito, com o mesmo critério: U07.1 ou U07.2 em qualquer linha.
+      </div></div>
+      <div class="passo" data-passo="1"><div class="cartao">
+        De 2020 a 2022, os dois países tiveram mortalidade parecida, com 3.469 óbitos por milhão de habitantes no Brasil e 3.295 nos EUA. O maior pico foi o do Brasil, com 122 óbitos por milhão na semana que terminou em 27 de março de 2021.
+      </div></div>
+      <div class="passo" data-passo="2"><div class="cartao">
+        A partir de 2023 a escala do gráfico muda, porque os valores ficam muito menores. No Brasil, a taxa anual passou de 61 óbitos por milhão em 2023 para 18 em 2025.
+      </div></div>
+      <div class="passo" data-passo="3"><div class="cartao">
+        Nos EUA, a taxa anual passou de 225 para 61 óbitos por milhão no mesmo período. Em todos os anos desde 2023, a taxa dos EUA ficou entre 3,4 e 4,1 vezes a do Brasil.
+      </div></div>
+      <div class="passo" data-passo="4"><div class="cartao">
+        Em janeiro de 2026, os EUA chegaram a 1,5 óbito por milhão em uma semana, quase cinco vezes o maior valor semanal do Brasil no ano (0,3, em março). Em agosto começou uma nova onda nos EUA, que ainda subia na última semana com dados.
+      </div></div>
+    </div>
+    <div class="grafico-fixo">
+      <h3 id="covid-titulo">Óbitos por covid-19 por semana</h3>
+      <p class="sub">Óbitos por milhão de habitantes, por semana: <span style="color:var(--brasil);font-weight:600">━ Brasil</span> &nbsp;<span style="color:var(--eua);font-weight:600">━ EUA</span></p>
+      <svg id="covid-svg" viewBox="0 0 720 460" role="img" aria-labelledby="covid-titulo"></svg>
+      <div class="fonte">Fonte: SIM (DATASUS), até 25/07/2026, preliminar em 2025 e 2026; CDC (NCHS), até 19/09/2026. População: Banco Mundial.</div>
+    </div>
+  </div>
+  <details class="tabela">
+    <summary>Ver os dados em tabela</summary>
+    <div class="tabela-rolagem"><table id="covid-tabela"></table></div>
+  </details>
+</section>
+
+<section class="capitulo" id="mortalidade">
+  <header>
+    <div class="numero">Capítulo 3</div>
+    <h2>Mortalidade infantil</h2>
+  </header>
+  <div class="rolagem">
+    <div class="passos">
+      <div class="passo" data-passo="0"><div class="cartao">
+        A taxa de mortalidade infantil é o número de óbitos de menores de 1 ano por mil nascidos vivos. A taxa era de 12,4 em 2015 e de 12,2 em 2025. Em todos os anos da série a taxa ficou entre 11,5 e 12,7, sem pico em 2021. Os nascidos vivos passaram de 3,0 milhões em 2015 para 2,5 milhões em 2025. Como a taxa é calculada por nascidos vivos, esta queda já está considerada.
+      </div></div>
+    </div>
+    <div class="grafico-fixo">
+      <h3 id="mort-titulo">Mortalidade infantil</h3>
+      <p class="sub">Óbitos de menores de 1 ano por mil nascidos vivos</p>
+      <svg id="mort-svg" viewBox="0 0 720 460" role="img" aria-labelledby="mort-titulo"></svg>
+      <div class="fonte">Fonte: SIM e SINASC (DATASUS), preliminares em 2025.</div>
+    </div>
+  </div>
+  <details class="tabela">
+    <summary>Ver os dados em tabela</summary>
+    <div class="tabela-rolagem"><table id="mort-tabela"></table></div>
+  </details>
+</section>
+
+<section class="capitulo" id="sarampo">
+  <header>
+    <div class="numero">Capítulo 4</div>
+    <h2>Sarampo, Brasil e EUA</h2>
+  </header>
+  <div class="rolagem">
+    <div class="passos">
+      <div class="passo" data-passo="0"><div class="cartao">
+        O gráfico mostra os casos confirmados de sarampo no Brasil de 2016 a agosto de 2026, com um ponto para cada caso. De 2018 a 2020, o Brasil teve 39.654 casos. Desde 2022, o país teve menos de 50 casos por ano.
+      </div></div>
+      <div class="passo" data-passo="1"><div class="cartao">
+        Os pontos em laranja são os casos dos EUA, na mesma escala. De 2016 a 2024, os EUA tiveram entre 12 e 1.282 casos por ano. Em 2019, foram 3,9 casos por milhão de habitantes nos EUA e 101 no Brasil.
+      </div></div>
+      <div class="passo" data-passo="2"><div class="cartao">
+        A partir de 2023 a escala do gráfico muda, porque os valores ficam muito menores. Os EUA tiveram 2.288 casos em 2025 e 3.074 de janeiro a agosto de 2026, os maiores valores da série. No mesmo período, o Brasil teve 38 e 24 casos. Em 2025, 34 dos 38 casos do Brasil foram importados ou ligados a um caso importado, segundo o Ministério da Saúde. Em 2025, foram 6,7 casos por milhão de habitantes nos EUA e 0,18 no Brasil.
+      </div></div>
+    </div>
+    <div class="grafico-fixo">
+      <h3 id="sar-titulo">Casos confirmados de sarampo por ano</h3>
+      <p class="sub">Um ponto para cada caso: <span style="color:var(--brasil);font-weight:600">■ Brasil</span> &nbsp;<span style="color:var(--eua);font-weight:600">■ EUA</span></p>
+      <div class="quadro-pontos" role="img" aria-labelledby="sar-titulo"><canvas id="sar-canvas"></canvas></div>
+      <div class="fonte">Fonte: OMS, dados mensais provisórios de sarampo, até agosto de 2026 (*2026: janeiro a agosto). A série começa em 2016 porque a planilha da OMS não tem os EUA em 2015. Os dados da OMS chegam com atraso em relação aos do Ministério da Saúde, que informa 42 casos confirmados no Brasil em 2026 até a semana epidemiológica 38. População: Banco Mundial.</div>
+    </div>
+  </div>
+  <details class="tabela">
+    <summary>Ver os dados em tabela</summary>
+    <div class="tabela-rolagem"><table id="sar-tabela"></table></div>
+  </details>
+</section>
+
+<footer>
+  Atualizado em outubro de 2026.<br>
+  Dados usados nos gráficos: <a href="dados/coberturas.csv">coberturas.csv</a>, <a href="dados/covid_semanal.csv">covid_semanal.csv</a>, <a href="dados/mortalidade_infantil.csv">mortalidade_infantil.csv</a>, <a href="dados/sarampo_mensal.csv">sarampo_mensal.csv</a>.
+</footer>
+
+<div class="dica" id="dica"></div>
+
+<script>
+const fmt = d3.format(".1f");
+const virgula = v => fmt(v).replace(".", ",");
+const dica = d3.select("#dica");
+const semMovimento = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+d3.csv("dados/coberturas.csv", d => ({
+  grupo: d.grupo_idade,
+  vacina: d.vacina,
+  ano: +d.ano,
+  cobertura: d.cobertura === "NA" || d.cobertura === "" ? null : +d.cobertura
+})).then(dados => {
+  dados = dados.filter(d => d.cobertura !== null);
+  const series = d3.groups(dados, d => d.grupo + " | " + d.vacina)
+    .map(([chave, v]) => ({ chave, vacina: v[0].vacina, grupo: v[0].grupo, valores: v.sort((a, b) => a.ano - b.ano) }));
+  const mediana = d3.rollups(dados, v => d3.median(v, d => d.cobertura), d => d.ano)
+    .map(([ano, cobertura]) => ({ ano, cobertura })).sort((a, b) => a.ano - b.ano);
+
+  capituloCobertura(series, mediana);
+});
+
+d3.csv("dados/covid_semanal.csv", d => ({
+  pais: d.pais,
+  semana: d3.timeParse("%Y-%m-%d")(d.semana_fim),
+  obitos: +d.obitos,
+  taxa: +d.taxa_por_milhao
+})).then(capituloCovid);
+
+d3.csv("dados/mortalidade_infantil.csv", d3.autoType).then(capituloMortalidade);
+
+d3.csv("dados/sarampo_mensal.csv", d3.autoType).then(capituloSarampo);
+
+// capa: as séries de todos os capítulos, azul para o Brasil e laranja para os EUA
+Promise.all(["coberturas", "covid_semanal", "mortalidade_infantil", "sarampo_mensal"].map(n => d3.csv(`dados/${n}.csv`, d3.autoType)))
+  .then(([cob, covid, infantil, sarampo]) => {
+    const porPais = (dados, campo) => d3.groups(dados, d => d.pais).map(([pais, v]) => ({ v: v.map(d => d[campo]), pais }));
+    capa([
+      ...d3.groups(cob.filter(d => d.cobertura !== null && d.cobertura !== "NA"), d => d.grupo_idade + d.vacina)
+        .map(([, v]) => ({ v: v.sort((a, b) => a.ano - b.ano).map(d => +d.cobertura), pais: "BRA" })),
+      ...porPais(covid, "taxa_por_milhao"),
+      { v: infantil.map(d => d.tmi), pais: "BRA" },
+      ...porPais(sarampo, "casos")
+    ]);
+  });
+
+// liga os passos de um capítulo ao gráfico dele
+function observarPassos(seletor, aplicar) {
+  const passos = document.querySelectorAll(seletor + " .passo");
+  const obs = new IntersectionObserver(entradas => {
+    entradas.forEach(en => {
+      if (!en.isIntersecting) return;
+      passos.forEach(p => p.classList.toggle("ativo", p === en.target));
+      aplicar(+en.target.dataset.passo);
+    });
+  }, { rootMargin: "-45% 0px -45% 0px" });
+  passos.forEach(p => obs.observe(p));
+}
+
+const ptBR = d3.timeFormatLocale({
+  dateTime: "%d/%m/%Y %H:%M", date: "%d/%m/%Y", time: "%H:%M", periods: ["", ""],
+  days: ["domingo", "segunda", "terça", "quarta", "quinta", "sexta", "sábado"],
+  shortDays: ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"],
+  months: ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"],
+  shortMonths: ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"]
+});
+const numeroBR = d3.formatLocale({ decimal: ",", thousands: ".", grouping: [3], currency: ["R$", ""] });
+
+function capituloCovid(dados) {
+  const nomes = { BRA: "Brasil", USA: "EUA" };
+  const paises = d3.groups(dados, d => d.pais).map(([pais, v]) => ({ pais, valores: v.sort((a, b) => a.semana - b.semana) }));
+  const L = 720, A = 460, m = { t: 20, r: 70, b: 36, l: 50 };
+  const fimDados = d3.max(dados, d => d.semana);
+  const x = d3.scaleTime().domain([new Date(2020, 0, 1), fimDados]).range([m.l, L - m.r]);
+  const y = d3.scaleLinear().domain([0, 130]).range([A - m.b, m.t]);
+  const linha = d3.line().x(d => x(d.semana)).y(d => y(d.taxa)).curve(d3.curveMonotoneX);
+  const svg = d3.select("#covid-svg");
+  const virg = numeroBR.format(",.1f"), inteiro = numeroBR.format(",d");
+
+  // área do gráfico recortada, para o que sai da escala no zoom não vazar
+  svg.append("clipPath").attr("id", "covid-area").append("rect").attr("x", m.l).attr("y", m.t - 10).attr("width", L - m.l - m.r).attr("height", A - m.t - m.b + 10);
+  svg.append("clipPath").attr("id", "covid-desenho").append("rect").attr("x", m.l).attr("y", 0).attr("width", 0).attr("height", A);
+  const desenho = svg.select("#covid-desenho rect");
+
+  const gx = svg.append("g").attr("class", "eixo").attr("transform", `translate(0,${A - m.b})`);
+  const gy = svg.append("g").attr("class", "eixo").attr("transform", `translate(${m.l},0)`);
+  function eixos(dur) {
+    const anos = (x.domain()[1] - x.domain()[0]) / (365 * 864e5);
+    gx.transition().duration(dur).call(d3.axisBottom(x).ticks(anos > 3 ? d3.timeYear.every(1) : d3.timeMonth.every(3))
+      .tickFormat(d => d.getMonth() === 0 ? ptBR.format("%Y")(d) : ptBR.format("%b")(d)).tickSize(0).tickPadding(10))
+      .call(g => g.select(".domain").remove());
+    gy.transition().duration(dur).call(d3.axisLeft(y).ticks(5).tickFormat(d => numeroBR.format(",~f")(d)).tickSize(-(L - m.l - m.r)).tickPadding(8))
+      .call(g => g.select(".domain").remove());
+  }
+  eixos(0);
+
+  const area = svg.append("g").attr("clip-path", "url(#covid-area)");
+  const fundo = area.append("g").attr("opacity", 0);
+  fundo.selectAll("path").data(paises).join("path").attr("class", d => "linha-pais " + d.pais).attr("opacity", 0.18).attr("d", d => linha(d.valores));
+  const frente = area.append("g").attr("clip-path", "url(#covid-desenho)");
+  const caminhos = frente.selectAll("path").data(paises).join("path").attr("class", d => "linha-pais " + d.pais).attr("d", d => linha(d.valores));
+
+  // rótulos dos países no fim de cada linha
+  const rotulos = svg.append("g").attr("opacity", 0);
+  const rotulo = rotulos.selectAll("text").data(paises).join("text").attr("class", d => "rotulo-pais " + d.pais).attr("x", L - m.r + 8).text(d => nomes[d.pais]);
+
+  // anotações de cada passo
+  const notas = svg.append("g");
+  function nota(texto, xx, yy, anc = "middle") {
+    return notas.append("text").attr("class", "anotacao").attr("text-anchor", anc).attr("opacity", 0).text(texto).datum({ xx, yy });
+  }
+  const picoBR = paises[0].valores.reduce((a, b) => b.taxa > a.taxa ? b : a);
+  const picoUS = paises[1].valores.filter(v => v.semana < new Date(2022, 11, 31)).reduce((a, b) => b.taxa > a.taxa ? b : a);
+  const pico26 = paises[1].valores.filter(v => v.semana >= new Date(2026, 0, 1)).reduce((a, b) => b.taxa > a.taxa ? b : a);
+  const notasPasso = {
+    1: [nota(`Brasil: ${inteiro(Math.round(picoBR.taxa))} por milhão`, picoBR.semana, picoBR.taxa + 6, "start"),
+        nota(`EUA: ${inteiro(Math.round(picoUS.taxa))}`, picoUS.semana, picoUS.taxa + 6, "end")],
+    3: [nota("EUA: de 3,4 a 4,1 vezes a taxa do Brasil, todo ano", new Date(2025, 2, 1), 10.5, "middle")],
+    4: [nota(`EUA: ${virg(pico26.taxa)} por milhão`, pico26.semana, pico26.taxa + 0.18, "start")]
+  };
+  const fimBR = svg.append("g").attr("opacity", 0);
+  const ultBR = paises[0].valores[paises[0].valores.length - 1].semana;
+  fimBR.append("line").attr("class", "troca-sistema").attr("y1", m.t).attr("y2", A - m.b);
+  fimBR.append("text").attr("y", m.t + 10).attr("text-anchor", "end").text("fim dos dados do Brasil");
+
+  function posicionar(dur) {
+    const tr = d3.transition().duration(dur).ease(d3.easeCubicInOut);
+    fundo.selectAll("path").transition(tr).attr("d", d => linha(d.valores));
+    caminhos.transition(tr).attr("d", d => linha(d.valores));
+    // rótulo no nível das últimas semanas de cada país, afastados se ficarem próximos
+    const ys = paises.map(d => Math.min(A - m.b, Math.max(m.t, y(d3.mean(d.valores.slice(-4), z => z.taxa)))) + 4);
+    if (Math.abs(ys[0] - ys[1]) < 16) { const meio = (ys[0] + ys[1]) / 2, sinal = ys[0] >= ys[1] ? 1 : -1; ys[0] = meio + sinal * 8; ys[1] = meio - sinal * 8; }
+    rotulo.transition(tr).attr("y", (d, i) => Math.min(A - m.b + 4, ys[i]));
+    Object.values(notasPasso).flat().forEach(n => n.transition(tr).attr("x", d => x(d.xx)).attr("y", d => y(d.yy)));
+    fimBR.selectAll("line").transition(tr).attr("x1", x(ultBR)).attr("x2", x(ultBR));
+    fimBR.selectAll("text").transition(tr).attr("x", x(ultBR) - 6);
+    eixos(dur);
+  }
+
+  const estados = [
+    { de: new Date(2020, 0, 1), ate: new Date(2022, 11, 31), x: [new Date(2020, 0, 1), fimDados], y: 130, fundo: 0, notas: [], fim: 0 },
+    { de: new Date(2020, 0, 1), ate: new Date(2022, 11, 31), x: [new Date(2020, 0, 1), fimDados], y: 130, fundo: 0, notas: [1], fim: 0 },
+    { de: new Date(2023, 0, 1), ate: fimDados, x: [new Date(2023, 0, 1), fimDados], y: 12.5, fundo: 1, notas: [], fim: 0 },
+    { de: new Date(2023, 0, 1), ate: fimDados, x: [new Date(2023, 0, 1), fimDados], y: 12.5, fundo: 1, notas: [3], fim: 0 },
+    { de: new Date(2025, 0, 1), ate: fimDados, x: [new Date(2025, 0, 1), fimDados], y: null, fundo: 1, notas: [4], fim: 1 }
+  ];
+  let atual = -1;
+  function aplicar(n) {
+    if (n === atual) return;
+    const e = estados[n], indo = n > atual, mudaEscala = atual < 0 || estados[atual].y !== e.y || +estados[atual].x[0] !== +e.x[0];
+    atual = n;
+    const dur = semMovimento ? 0 : 1400;
+    x.domain(e.x);
+    const janela = dados.filter(d => d.semana >= e.x[0]);
+    y.domain([0, e.y || d3.max(janela, d => d.taxa) * 1.2]);
+    posicionar(mudaEscala ? dur : 0);
+    // desenha da esquerda para a direita, depois de a escala chegar
+    desenho.interrupt();
+    if (indo && (n === 0 || mudaEscala)) desenho.attr("x", Math.max(m.l, x(e.de))).attr("width", 0);
+    desenho.transition().delay(mudaEscala && n > 0 ? dur * 0.6 : 0).duration(indo ? dur * 1.2 : dur / 2).ease(d3.easeCubicInOut)
+      .attr("x", Math.max(m.l, x(e.de))).attr("width", Math.max(0, x(e.ate) - Math.max(m.l, x(e.de))) + 2);
+    fundo.transition().duration(semMovimento ? 0 : 600).attr("opacity", e.fundo);
+    Object.entries(notasPasso).forEach(([k, ns]) => ns.forEach(nn => nn.transition().delay(e.notas.includes(+k) && indo ? dur : 0).duration(semMovimento ? 0 : 500).attr("opacity", e.notas.includes(+k) ? 1 : 0)));
+    fimBR.transition().duration(semMovimento ? 0 : 500).attr("opacity", e.fim);
+    rotulos.transition().delay(e.fundo && indo ? dur : 0).duration(semMovimento ? 0 : 500).attr("opacity", e.fundo);
+  }
+  observarPassos("#covid", aplicar);
+
+  // mira ao passar o mouse: os dois países na semana mais próxima
+  const mira = svg.append("line").attr("class", "mira").attr("y1", m.t).attr("y2", A - m.b).attr("opacity", 0);
+  const bissetor = d3.bisector(d => d.semana).center;
+  svg.append("rect").attr("x", m.l).attr("y", m.t).attr("width", L - m.l - m.r).attr("height", A - m.t - m.b).attr("fill", "transparent")
+    .on("mousemove", function (ev) {
+      const [px] = d3.pointer(ev, svg.node());
+      const data = x.invert(px);
+      const linhasDica = paises.map(p => {
+        const v = p.valores[bissetor(p.valores, data)];
+        return v && Math.abs(v.semana - data) < 8 * 864e5 ? `<span>${nomes[p.pais]}: ${virg(v.taxa)} por milhão (${inteiro(v.obitos)} óbitos)</span>` : `<span>${nomes[p.pais]}: sem dado</span>`;
+      });
+      const ref = paises[1].valores[bissetor(paises[1].valores, data)];
+      mira.attr("x1", x(ref.semana)).attr("x2", x(ref.semana)).attr("opacity", 1);
+      dica.style("opacity", 1).style("left", (ev.clientX + 14) + "px").style("top", (ev.clientY + 14) + "px")
+        .html(`<b>Semana até ${ptBR.format("%d/%m/%Y")(ref.semana)}</b>${linhasDica.join("<br>")}`);
+    })
+    .on("mouseleave", () => { dica.style("opacity", 0); mira.attr("opacity", 0); });
+
+  // tabela por ano
+  const porAno = d3.rollups(dados, v => ({ obitos: d3.sum(v, d => d.obitos), taxa: d3.sum(v, d => d.taxa) }), d => d.semana.getFullYear(), d => d.pais);
+  const tab = d3.select("#covid-tabela");
+  const ultimoAno = fimDados.getFullYear();
+  tab.append("thead").append("tr").selectAll("th").data(["Ano", "Óbitos Brasil", "Por milhão Brasil", "Óbitos EUA", "Por milhão EUA"]).join("th").text(d => d);
+  tab.append("tbody").selectAll("tr").data(porAno.sort((a, b) => a[0] - b[0])).join("tr").selectAll("td")
+    .data(([ano, ps]) => { const g = new Map(ps); return [ano === ultimoAno ? `${ano} (Brasil até ${ptBR.format("%d/%m")(ultBR)}, EUA até ${ptBR.format("%d/%m")(fimDados)})` : ano, inteiro(g.get("BRA").obitos), virg(g.get("BRA").taxa), inteiro(g.get("USA").obitos), virg(g.get("USA").taxa)]; })
+    .join("td").text(d => d);
+}
+
+function capituloMortalidade(dados) {
+  dados.sort((a, b) => a.ano - b.ano);
+  const L = 720, A = 460, m = { t: 30, r: 40, b: 36, l: 50 };
+  const x = d3.scaleLinear().domain([2015, 2025]).range([m.l, L - m.r]);
+  const y = d3.scaleLinear().domain([0, 15]).range([A - m.b, m.t]);
+  const svg = d3.select("#mort-svg");
+  const virg = numeroBR.format(",.1f"), inteiro = numeroBR.format(",d");
+
+  svg.append("clipPath").attr("id", "mort-desenho").append("rect").attr("x", m.l - 10).attr("y", 0).attr("width", 0).attr("height", A);
+  const desenho = svg.select("#mort-desenho rect");
+
+  svg.append("g").attr("class", "eixo").attr("transform", `translate(0,${A - m.b})`)
+    .call(d3.axisBottom(x).tickFormat(d3.format("d")).ticks(11).tickSize(0).tickPadding(10))
+    .call(g => g.select(".domain").remove());
+  svg.append("g").attr("class", "eixo").attr("transform", `translate(${m.l},0)`)
+    .call(d3.axisLeft(y).ticks(6).tickFormat(d => numeroBR.format(",~f")(d)).tickSize(-(L - m.l - m.r)).tickPadding(8))
+    .call(g => g.select(".domain").remove());
+
+  // a linha recortada pelo retângulo que cresce da esquerda para a direita
+  const infantil = svg.append("g").attr("clip-path", "url(#mort-desenho)");
+  infantil.append("path").datum(dados).attr("class", "linha-principal").attr("d", d3.line().x(d => x(d.ano)).y(d => y(d.tmi)));
+  infantil.selectAll("circle").data(dados).join("circle").attr("class", "ponto-principal").attr("r", 5).attr("cx", d => x(d.ano)).attr("cy", d => y(d.tmi));
+
+  const ano = a => dados.find(d => d.ano === a);
+  const notas = svg.append("g").attr("opacity", 0);
+  function nota(a, dy, anc = "middle") {
+    notas.append("text").attr("class", "anotacao").attr("text-anchor", anc).attr("x", x(a)).attr("y", y(ano(a).tmi) + dy).text(`${a}: ${virg(ano(a).tmi)}`);
+  }
+  nota(2015, -16, "start");
+  nota(2021, 30);
+  nota(2025, -16, "end");
+
+  let desenhado = false;
+  function aplicar() {
+    if (desenhado) return;
+    desenhado = true;
+    const dur = semMovimento ? 0 : 1400;
+    desenho.transition().duration(dur).ease(d3.easeCubicInOut).attr("width", L - m.l - m.r + 20);
+    notas.transition().delay(dur).duration(semMovimento ? 0 : 500).attr("opacity", 1);
+  }
+  observarPassos("#mortalidade", aplicar);
+
+  // mira ao passar o mouse: o valor do ano mais próximo
+  const mira = svg.append("line").attr("class", "mira").attr("y1", m.t).attr("y2", A - m.b).attr("opacity", 0);
+  svg.append("rect").attr("x", m.l).attr("y", m.t).attr("width", L - m.l - m.r).attr("height", A - m.t - m.b).attr("fill", "transparent")
+    .on("mousemove", function (ev) {
+      const [px] = d3.pointer(ev, svg.node());
+      const d = ano(Math.max(2015, Math.min(2025, Math.round(x.invert(px)))));
+      mira.attr("x1", x(d.ano)).attr("x2", x(d.ano)).attr("opacity", 1);
+      dica.style("opacity", 1).style("left", (ev.clientX + 14) + "px").style("top", (ev.clientY + 14) + "px")
+        .html(`<b>${d.ano}</b><span>${virg(d.tmi)} por mil nascidos vivos</span><br><span>${inteiro(d.obitos_infantis)} óbitos, ${inteiro(d.nascidos_vivos)} nascidos vivos</span>`);
+    })
+    .on("mouseleave", () => { dica.style("opacity", 0); mira.attr("opacity", 0); });
+
+  // tabela por ano
+  const tab = d3.select("#mort-tabela");
+  tab.append("thead").append("tr").selectAll("th").data(["Ano", "Nascidos vivos", "Óbitos infantis", "Taxa infantil"]).join("th").text(d => d);
+  tab.append("tbody").selectAll("tr").data(dados).join("tr").selectAll("td")
+    .data(d => [d.ano, inteiro(d.nascidos_vivos), inteiro(d.obitos_infantis), virg(d.tmi)])
+    .join("td").text(d => d);
+}
+
+function capituloSarampo(dados) {
+  const nomes = { BRA: "Brasil", USA: "EUA" };
+  const ultimoAno = d3.max(dados, d => d.ano);
+  const ultimoMes = d3.max(dados.filter(d => d.ano === ultimoAno), d => d.mes);
+  const porAno = d3.rollup(dados, v => d3.sum(v, d => d.casos), d => d.ano, d => d.pais);
+  const casos = (ano, pais) => (porAno.get(ano) || new Map()).get(pais) || 0;
+  const todosAnos = Array.from(porAno.keys()).sort((a, b) => a - b);
+  const rotuloAno = a => a === ultimoAno && ultimoMes < 12 ? a + "*" : String(a);
+  const inteiro = numeroBR.format(",d");
+
+  const canvas = document.getElementById("sar-canvas");
+  const ctx = canvas.getContext("2d");
+  const estilo = getComputedStyle(document.documentElement);
+  const cor = { BRA: estilo.getPropertyValue("--brasil").trim(), USA: estilo.getPropertyValue("--eua").trim(),
+    texto: estilo.getPropertyValue("--text-secondary").trim(), forte: estilo.getPropertyValue("--text-primary").trim() };
+  let L = 720, A = 460;
+  function medir() {
+    const r = window.devicePixelRatio || 1;
+    L = canvas.clientWidth || 720; A = canvas.clientHeight || 460;
+    canvas.width = L * r; canvas.height = A * r;
+    ctx.setTransform(r, 0, 0, r, 0, 0);
+  }
+
+  // cada passo: os anos mostrados, os países visíveis e o maior valor que a escala precisa caber
+  const estados = [
+    { anos: todosAnos, paises: ["BRA"], escala: "toda" },
+    { anos: todosAnos, paises: ["BRA", "USA"], escala: "toda" },
+    { anos: todosAnos.filter(a => a >= 2023), paises: ["BRA", "USA"], escala: "recente" }
+  ];
+
+  // coluna de pontos de cada país em cada ano; o lado do ponto é o maior que faz caber o maior valor
+  function arranjo(e) {
+    const m = { t: 34, b: 30, l: 8, r: 8 };
+    const larguraAno = (L - m.l - m.r) / e.anos.length;
+    const larguraCol = larguraAno * 0.4, altura = A - m.t - m.b;
+    const maximo = d3.max(e.anos, a => d3.max(["BRA", "USA"], p => casos(a, p)));
+    let lado = 12;
+    while (lado > 0.6 && Math.floor(larguraCol / lado) * Math.floor(altura / lado) < maximo) lado -= 0.05;
+    const porLinha = Math.max(1, Math.floor(larguraCol / lado));
+    const colunas = [];
+    e.anos.forEach((a, i) => ["BRA", "USA"].forEach((p, k) => {
+      const x0 = m.l + i * larguraAno + larguraAno * 0.08 + k * (larguraCol + larguraAno * 0.04);
+      colunas.push({ ano: a, pais: p, n: casos(a, p), x0, largura: larguraCol, linhas: Math.ceil(casos(a, p) / porLinha), i });
+    }));
+    return { m, larguraAno, lado, porLinha, colunas, base: A - m.b };
+  }
+
+  let atual = -1, anterior = -1, progresso = 1, inicio = 0, quadroPedido = null;
+  function desenhar() {
+    if (atual < 0) return;
+    const e = estados[atual], g = arranjo(e);
+    const mesmaEscala = anterior >= 0 && estados[anterior].escala === e.escala;
+    const jaVisiveis = mesmaEscala ? estados[anterior].paises : [];
+    ctx.clearRect(0, 0, L, A);
+    const lado = g.lado, ponto = lado >= 2 ? lado * 0.78 : lado;
+    const nAnos = e.anos.length;
+    g.colunas.forEach(c => {
+      if (!e.paises.includes(c.pais)) return;
+      // da esquerda para a direita: cada ano começa um pouco depois do anterior
+      const p = jaVisiveis.includes(c.pais) ? 1 : Math.max(0, Math.min(1, (progresso - c.i / nAnos * 0.6) / 0.4));
+      const mostrar = Math.round(c.n * p);
+      ctx.fillStyle = cor[c.pais];
+      for (let j = 0; j < mostrar; j++) {
+        const col = j % g.porLinha, lin = Math.floor(j / g.porLinha);
+        ctx.fillRect(c.x0 + col * lado, g.base - (lin + 1) * lado, ponto, ponto);
+      }
+      // número de casos em cima da coluna, quando a coluna termina
+      if (p >= 1) {
+        ctx.fillStyle = cor[c.pais];
+        ctx.font = "600 12px Inter, system-ui, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(inteiro(c.n), c.x0 + c.largura / 2, g.base - c.linhas * lado - 6);
+      }
+    });
+    ctx.fillStyle = cor.texto;
+    ctx.font = "12px Inter, system-ui, sans-serif";
+    ctx.textAlign = "center";
+    e.anos.forEach((a, i) => ctx.fillText(rotuloAno(a), g.m.l + (i + 0.5) * g.larguraAno, A - 8));
+  }
+  function animar(t) {
+    if (!inicio) inicio = t;
+    progresso = semMovimento ? 1 : Math.min(1, (t - inicio) / 1600);
+    desenhar();
+    quadroPedido = progresso < 1 ? requestAnimationFrame(animar) : null;
+  }
+  function aplicar(n) {
+    if (n === atual) return;
+    const indo = n > atual;
+    anterior = indo ? atual : -1;
+    atual = n;
+    if (quadroPedido) cancelAnimationFrame(quadroPedido);
+    medir();
+    // voltando, desenha tudo de uma vez
+    if (!indo) { progresso = 1; desenhar(); return; }
+    progresso = 0; inicio = 0;
+    quadroPedido = requestAnimationFrame(animar);
+  }
+  observarPassos("#sarampo", aplicar);
+  window.addEventListener("resize", () => { medir(); desenhar(); });
+
+  // ao passar o mouse: os dois países no ano da coluna
+  canvas.addEventListener("mousemove", ev => {
+    if (atual < 0) return;
+    const e = estados[atual], g = arranjo(e);
+    const caixa = canvas.getBoundingClientRect();
+    const i = Math.floor((ev.clientX - caixa.left - g.m.l) / g.larguraAno);
+    if (i < 0 || i >= e.anos.length) { dica.style("opacity", 0); return; }
+    const a = e.anos[i];
+    const linhas = e.paises.map(p => `<span>${nomes[p]}: ${inteiro(casos(a, p))} casos</span>`).join("<br>");
+    dica.style("opacity", 1).style("left", (ev.clientX + 14) + "px").style("top", (ev.clientY + 14) + "px")
+      .html(`<b>${a === ultimoAno && ultimoMes < 12 ? a + ", janeiro a " + ptBR.format("%B")(new Date(a, ultimoMes - 1, 1)) : a}</b>${linhas}`);
+  });
+  canvas.addEventListener("mouseleave", () => dica.style("opacity", 0));
+
+  // tabela por ano
+  const tab = d3.select("#sar-tabela");
+  tab.append("thead").append("tr").selectAll("th").data(["Ano", "Casos Brasil", "Casos EUA"]).join("th").text(d => d);
+  tab.append("tbody").selectAll("tr").data(todosAnos).join("tr").selectAll("td")
+    .data(a => [rotuloAno(a), inteiro(casos(a, "BRA")), inteiro(casos(a, "USA"))]).join("td").text(d => d);
+}
+
+// capa: as séries se desenhando devagar, em laço
+function capa(linhas) {
+  const canvas = document.getElementById("capa-canvas");
+  const ctx = canvas.getContext("2d");
+  let L, A;
+  function medir() {
+    const r = window.devicePixelRatio || 1;
+    L = canvas.clientWidth; A = canvas.clientHeight;
+    canvas.width = L * r; canvas.height = A * r;
+    ctx.setTransform(r, 0, 0, r, 0, 0);
+  }
+  medir();
+  // sem animação, o desenho é feito uma vez só e precisa ser refeito quando a janela muda
+  window.addEventListener("resize", () => { medir(); if (semMovimento) quadro(0); });
+  // cada série vira uma curva atravessando a tela, com faixas em alturas diferentes,
+  // cada uma na própria escala, porque as unidades dos capítulos são diferentes
+  const camadas = linhas.flatMap((s, i) => [0, 1].map(k => ({ ...s, y0: d3.min(s.v), y1: d3.max(s.v), faixa: (i * 0.37 + k * 0.5) % 1, atraso: (i * 0.13 + k * 0.4) % 1 })));
+  const cores = { BRA: "75, 151, 238", USA: "240, 122, 69" };
+  const ciclo = 14000;
+  function quadro(t) {
+    ctx.clearRect(0, 0, L, A);
+    camadas.forEach(c => {
+      const fase = semMovimento ? 1 : ((t / ciclo + c.atraso) % 1);
+      const progresso = Math.min(1, fase * 1.6);
+      const alfa = semMovimento ? 0.3 : 0.42 * Math.min(1, (1 - fase) * 4);
+      const x = d3.scaleLinear().domain([0, c.v.length - 1]).range([-20, L + 20]);
+      const altura = A * 0.35;
+      const base = A * 0.08 + c.faixa * A * 0.6;
+      const y = d3.scaleLinear().domain([c.y0, c.y1 > c.y0 ? c.y1 : c.y0 + 1]).range([base + altura, base]);
+      const pts = c.v.map((val, j) => [x(j), y(val)]);
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(0, 0, L * progresso, A);
+      ctx.clip();
+      ctx.beginPath();
+      d3.line().curve(d3.curveCatmullRom).context(ctx)(pts);
+      ctx.strokeStyle = `rgba(${cores[c.pais]}, ${alfa})`;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.restore();
+    });
+    if (!semMovimento) requestAnimationFrame(quadro);
+  }
+  requestAnimationFrame(quadro);
+}
+
+function capituloCobertura(series, mediana) {
+  const L = 720, A = 460, m = { t: 20, r: 150, b: 36, l: 44 };
+  const x = d3.scaleLinear().domain([2015, 2025]).range([m.l, L - m.r]);
+  const y = d3.scaleLinear().domain([40, 105]).range([A - m.b, m.t]);
+  const linha = d3.line().x(d => x(d.ano)).y(d => y(d.cobertura));
+  const svg = d3.select("#cob-svg");
+
+  svg.append("g").attr("class", "eixo").attr("transform", `translate(0,${A - m.b})`)
+    .call(d3.axisBottom(x).tickFormat(d3.format("d")).ticks(11).tickSize(0).tickPadding(10))
+    .call(g => g.select(".domain").remove());
+  svg.append("g").attr("class", "eixo").attr("transform", `translate(${m.l},0)`)
+    .call(d3.axisLeft(y).tickValues([40, 50, 60, 70, 80, 90, 100]).tickFormat(d => d + "%").tickSize(-(L - m.l - m.r)).tickPadding(8))
+    .call(g => g.select(".domain").remove());
+
+  // troca de sistema entre 2022 e 2023
+  const troca = svg.append("g").attr("opacity", 0);
+  troca.append("line").attr("class", "troca-sistema").attr("x1", x(2022.5)).attr("x2", x(2022.5)).attr("y1", m.t).attr("y2", A - m.b);
+  troca.append("text").attr("x", x(2022.5) + 6).attr("y", m.t + 10).text("troca de sistema");
+
+  // meta de 95%
+  const meta = svg.append("g").attr("opacity", 0);
+  meta.append("line").attr("class", "meta-linha").attr("x1", m.l).attr("x2", L - m.r).attr("y1", y(95)).attr("y2", y(95));
+  meta.append("text").attr("class", "meta-texto").attr("x", L - m.r + 8).attr("y", y(95) + 4).text("meta de 95%");
+
+  // fundo: a série inteira em cinza, que aparece depois do primeiro desenho
+  const fundo = svg.append("g").attr("opacity", 0);
+  fundo.selectAll("path").data(series).join("path").attr("class", "linha-fraca").attr("d", d => linha(d.valores));
+
+  // destaque: recortado por um retângulo que cresce da esquerda para a direita
+  svg.append("clipPath").attr("id", "recorte").append("rect").attr("x", x(2015) - 6).attr("y", 0).attr("width", 0).attr("height", A);
+  const recorte = svg.select("#recorte rect");
+  const destaque = svg.append("g").attr("clip-path", "url(#recorte)");
+  const linhas = destaque.selectAll("path").data(series).join("path")
+    .attr("class", "linha-destaque").attr("opacity", 0.75).attr("d", d => linha(d.valores));
+  destaque.append("path").datum(mediana).attr("class", "linha-mediana").attr("d", linha);
+
+  // rótulos das vacinas que atingiram a meta em 2024
+  const em2024 = s => (s.valores.find(v => v.ano === 2024) || {}).cobertura;
+  const naMeta = series.filter(s => em2024(s) >= 95).sort((a, b) => em2024(b) - em2024(a));
+  const rotulos = svg.append("g").attr("opacity", 0);
+  naMeta.forEach((s, i) => {
+    rotulos.append("circle").attr("cx", x(2024)).attr("cy", y(em2024(s))).attr("r", 4.5).attr("fill", "var(--series)").attr("stroke", "var(--surface)").attr("stroke-width", 2);
+    rotulos.append("text").attr("class", "rotulo-vacina").attr("x", L - m.r + 8).attr("y", y(95) + 26 + i * 16).text(`${s.vacina} ${virgula(em2024(s))}%`);
+  });
+
+  // anotações da mediana
+  const anot = svg.append("g");
+  function ponto(ano, texto, dx, dy) {
+    const d = mediana.find(v => v.ano === ano);
+    const g = anot.append("g").attr("opacity", 0);
+    g.append("circle").attr("class", "ponto-mediana").attr("cx", x(ano)).attr("cy", y(d.cobertura)).attr("r", 6.5);
+    g.append("text").attr("class", "anotacao").attr("x", x(ano) + dx).attr("y", y(d.cobertura) + dy).attr("text-anchor", "middle").text(texto);
+    return g;
+  }
+  const pontos = { 2015: ponto(2015, "94%", 16, -14), 2021: ponto(2021, "68%", 0, 28), 2024: ponto(2024, "90%", 0, -16), 2025: ponto(2025, "89%", 16, 28) };
+
+  // cada passo diz de onde até onde desenhar e o que mostrar
+  const estados = [
+    { de: 2015, ate: 2025, fundo: 0, pontos: [], meta: 0, rotulos: 0, troca: 0 },
+    { de: 2015, ate: 2021, fundo: 1, pontos: [2015, 2021], meta: 0, rotulos: 0, troca: 0 },
+    { de: 2021, ate: 2024, fundo: 1, pontos: [2021, 2024], meta: 0, rotulos: 0, troca: 0 },
+    { de: 2015, ate: 2024, fundo: 1, pontos: [2021, 2024], meta: 1, rotulos: 1, troca: 0 },
+    { de: 2015, ate: 2025, fundo: 1, pontos: [2015, 2021, 2024, 2025], meta: 1, rotulos: 0, troca: 1 }
+  ];
+  let atual = -1;
+  function aplicar(n) {
+    if (n === atual) return;
+    const e = estados[n], indo = n > atual;
+    atual = n;
+    const dur = semMovimento ? 0 : 1600;
+    const curta = () => d3.transition().duration(semMovimento ? 0 : 600);
+    // desenha a janela do passo da esquerda para a direita; voltando, só ajusta
+    recorte.interrupt();
+    if (indo) recorte.attr("x", x(e.de) - 6).attr("width", 0);
+    recorte.transition().duration(indo ? dur : dur / 2).ease(d3.easeCubicInOut)
+      .attr("x", x(e.de) - 6).attr("width", x(e.ate) - x(e.de) + 12);
+    fundo.transition(curta()).attr("opacity", e.fundo);
+    Object.entries(pontos).forEach(([ano, g]) => g.transition(curta()).delay(e.pontos.includes(+ano) && indo ? dur * 0.7 : 0).attr("opacity", e.pontos.includes(+ano) ? 1 : 0));
+    meta.transition(curta()).attr("opacity", e.meta);
+    rotulos.transition(curta()).delay(e.rotulos && indo ? dur * 0.6 : 0).attr("opacity", e.rotulos);
+    troca.transition(curta()).attr("opacity", e.troca);
+  }
+
+  const passos = document.querySelectorAll("#coberturas .passo");
+  const obs = new IntersectionObserver(entradas => {
+    entradas.forEach(en => {
+      if (!en.isIntersecting) return;
+      passos.forEach(p => p.classList.toggle("ativo", p === en.target));
+      aplicar(+en.target.dataset.passo);
+    });
+  }, { rootMargin: "-45% 0px -45% 0px" });
+  passos.forEach(p => obs.observe(p));
+  const alvoInicial = location.hash.match(/^#passo-(\d)$/);
+  if (alvoInicial) passos[+alvoInicial[1]].scrollIntoView({ block: "center" });
+
+  // dica ao passar o mouse: vacina mais próxima no ano mais próximo
+  const todos = series.flatMap(s => s.valores.map(v => ({ s, v })));
+  svg.append("rect").attr("x", m.l).attr("y", m.t).attr("width", L - m.l - m.r).attr("height", A - m.t - m.b)
+    .attr("fill", "transparent")
+    .on("mousemove", function (ev) {
+      const [px, py] = d3.pointer(ev, svg.node());
+      const ano = Math.round(x.invert(px));
+      const alvo = d3.least(todos.filter(p => p.v.ano === ano), p => Math.abs(y(p.v.cobertura) - py));
+      if (!alvo) return;
+      linhas.classed("linha-hover", d => d === alvo.s);
+      const med = mediana.find(v => v.ano === ano);
+      dica.style("opacity", 1).style("left", (ev.clientX + 14) + "px").style("top", (ev.clientY + 14) + "px")
+        .html(`<b>${alvo.s.vacina}</b><span>${alvo.s.grupo}, ${ano}: ${virgula(alvo.v.cobertura)}%</span><br><span>Mediana das vacinas: ${virgula(med.cobertura)}%</span>`);
+    })
+    .on("mouseleave", () => { dica.style("opacity", 0); linhas.classed("linha-hover", false); });
+
+  // tabela
+  const anos = d3.range(2015, 2026);
+  const tab = d3.select("#cob-tabela");
+  tab.append("thead").append("tr").selectAll("th").data(["Vacina", "Idade", ...anos]).join("th").text(d => d);
+  tab.append("tbody").selectAll("tr").data(series).join("tr").selectAll("td")
+    .data(s => [s.vacina, s.grupo, ...anos.map(a => { const v = s.valores.find(z => z.ano === a); return v ? virgula(v.cobertura) : "–"; })])
+    .join("td").text(d => d);
+}
+</script>
+</body>
+</html>
